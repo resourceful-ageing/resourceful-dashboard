@@ -1,0 +1,12 @@
+extends layout
+
+block content  
+    .container
+        h1 Export
+        if (!exportError)
+          each file, f in exportFiles
+            a(class="btn btn-success" style="margin-bottom:10px;" href="../exports/#{file}.json" download="#{file}.json") Download "#{file}"
+            br
+          div(class="alert alert-success", role="alert")= exportMessage
+        if (exportError)
+          div(class="alert alert-danger", role="alert")= exportMessage

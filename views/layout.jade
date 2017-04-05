@@ -1,0 +1,50 @@
+doctype html
+html
+  head  
+    title= title
+    link(rel='stylesheet', href='/public/stylesheets/style.css')
+    link(rel='stylesheet', href='/bc/bootstrap-css/css/bootstrap.css')
+    script(src="/bc/jquery/dist/jquery.min.js")
+    script(src='/bc/bootstrap-css/js/bootstrap.min.js')
+    script(src="/bc/moment/moment.js")
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    
+  block scripts
+   
+    
+    
+  body
+    block navbar
+      -var menu = { 'Config': '/config' };
+    
+
+      nav.navbar.navbar-inverse.navbar-static-top
+        .container
+          .navbar-header
+            button.collapsed.navbar-toggle(type='button', data-toggle='collapse', data-target='#navbar-links', aria-expanded='false')
+              span.sr-only Toggle navigation
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.navbar-brand(href='#') Logo
+          #navbar-links.collapse.navbar-collapse
+            ul.nav.navbar-nav
+              if user
+                each val, key in menu
+                  if menuItem === key
+                    li.active
+                      a(href=val, title=key)= key
+                  else
+                    li
+                      a(href=val, title=key)= key
+            ul.nav.navbar-nav.navbar-right
+              
+              if (user)
+                li
+                  p(class="navbar-text") 
+                    i(class="glyphicon glyphicon-user", style="margin-right:5px;")
+                    = user.name
+                li
+                  a(href="/signout") Sign out
+
+    block content

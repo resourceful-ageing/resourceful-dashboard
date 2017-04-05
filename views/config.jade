@@ -1,0 +1,122 @@
+extends layout
+
+block scripts
+    
+    script.
+    
+        function updateSensors(e) {
+          if ($(e).is("[disabled]")) {
+            return false;
+          } else {
+            $(e).text('Refreshing...').attr('disabled', 'disabled').blur();
+          }
+          let gatewayId = $(e).attr('data-id');
+          $.post("/list-sensors", { gatewayId: gatewayId });
+          
+          setTimeout(function(){ 
+          
+            $.get('/api/gateways/'+gatewayId+'/sensors', function(sensorData){
+              let gatewayContainer = $('[data-info="gateway"][data-id="'+gatewayId+'"]');
+              let sensorsContainer = $('.sensors-container > tbody', gatewayContainer);
+              var lastLogDate = moment.unix().format("HH:mm:ss DD/MM/YYYY");
+              if (sensorData.length > 0) {
+                for(var s=0; s < sensorData.length; s++) {
+                  let sensorContainer = $('[data-info="sensor"][data-id="'+sensorData[s].sensorId+'"]', sensorsContainer);
+                  let state = ((moment(moment().unix()).diff(sensorData[s].lastStatus))) > 10 ? 'offline' : 'online';
+                  sensorContainer.attr('data-state', state);
+                  $('td[data-ref="lastLog"]', sensorContainer).text(moment.unix(sensorData[s].lastLog).format("HH:mm:ss DD/MM/YYYY"));
+                  $('td[data-ref="lastStatus"]', sensorContainer).text(moment.unix(sensorData[s].lastStatus).format("HH:mm:ss DD/MM/YYYY"));
+                  
+                  lastLogDate = moment.unix(sensorData[s].lastStatus).format("HH:mm:ss DD/MM/YYYY");
+                };
+              }
+              
+              $(e).html('Refresh sensors<br/><span class="small">(last update: '+lastLogDate+')</span>').removeAttr('disabled');
+            });
+          }, 5000);
+        }
+        
+        function update(e) {
+          if ($(e).is("[disabled]")) {
+            return false;
+          }
+          
+          let gatewayId = $(e).attr('data-id');
+          $.post("/update-gateway", { gatewayId: gatewayId });
+        }
+        
+        function reboot(e) {
+          if ($(e).is("[disabled]")) {
+            return false;
+          }
+          let gatewayId = $(e).attr('data-id');
+          $.post("/reboot-gateway", { gatewayId: gatewayId });
+          refresh();
+        }
+        
+        $(function() {
+          function refresh() {
+            $.get('/api/gateways', function(data, status){
+              var gatewaysContainer = $('#gateways-container');
+
+              for(var i=0; i < data.length; i++) {
+                var state = (data[i].action == 'Connect' ? 'online' : 'offline');
+                var gatewayContainer = $('[data-info="gateway"][data-id="'+data[i].gatewayId+'"]');
+                if (gatewayContainer.length > 0) {
+                  gatewayContainer.attr('data-state', state);
+                } else {
+                  gatewayContainer = $('<div class="gateway-container" data-info="gateway" data-id="'+data[i].gatewayId+'" data-state="'+state+'"><span class="gateway-info"><span class="state" /><span class="title">'+data[i].location + ' <span class="small">(' + data[i].gatewayId+')</span></span></span><ul class="actions"><li><a href="#/" onclick="update(this);" data-action="update" data-id="'+data[i].gatewayId+'">Update</a></li><li><a href="#/" onclick="reboot(this);" data-action="reboot" data-id="'+data[i].gatewayId+'">Reboot</a></li><li><a href="#/" onclick="updateSensors(this);" data-action="update-sensors" data-id="'+data[i].gatewayId+'">Refresh sensors</a></li></ul><table class="table table-sensors sensors-container"><thead><tr><th width="20%">Sensor ID</th><th width="65%">Attached to object</th><th width="15%">Last logged data</th></tr></thead><tbody></tbody></table></div>');
+                  gatewaysContainer.append(gatewayContainer);
+                  
+                  let gatewayData = data[i];
+                  let sensorsContainer = $('.sensors-container > tbody', gatewayContainer);
+                  
+                  
+                  for(var s=0; s < data[i].sensors.length; s++) {
+                    var sensorData = data[i].sensors; 
+                    sensorData.sort((a, b) => a.object.localeCompare(b.object));
+                    if (sensorData.length == 0) {
+                      sensorsContainer.append('<tr><td colspan="4">No sensors found</td></tr>');
+                    } else {
+                      for(var s=0; s < sensorData.length; s++) {
+                        let lastLogDate = sensorData[s].lastLog == 0 ? '-' : moment.unix(sensorData[s].lastLog).format("HH:mm:ss DD/MM/YYYY");
+                        
+                        sensorContainer = '<tr data-info="sensor" data-id="'+sensorData[s].sensorId+'"><td><span class="state" data-state="unknown" />'+sensorData[s].sensorId+'</td><td>'+sensorData[s].object+'</td><td data-ref="lastLog" colspan="2">'+lastLogDate+'</td></tr>';
+                        sensorsContainer.append(sensorContainer);
+                      };
+                    }
+                  }
+                }
+                if (state == 'offline') {
+                  $('[data-info="sensor"]', gatewayContainer).attr('data-state', 'offline');
+                }
+              }
+            });            
+          };
+          
+          refresh();
+          
+          setInterval(function(){
+            refresh();
+          }, 30000);
+        });
+
+
+block content  
+    .container
+        h1 Configure
+
+        h2 Gateways
+        div(id="gateways-container")
+              
+        h2 Export logs
+        p
+          form(action="/config/export" method="post" class="form-export")
+            div(class="form-group")
+              label(for="datefrom") Date from:
+              input.form-control(name="datefrom" type='date', placeholder='yyyy-mm-dd', autofocus='')
+            div(class="form-group")
+              label(for="datetill") Date till:
+              input.form-control(name="datetill" type='date', placeholder='yyyy-mm-dd')
+            button.btn.btn-success(type='submit')
+              | Export logs

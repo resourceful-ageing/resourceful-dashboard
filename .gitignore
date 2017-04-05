@@ -1,0 +1,9 @@
+node_modules/
+exports/
+*.DS_Store
+.github/
+.git/
+logs
+*.log
+appClient.properties
+vcap-local.json

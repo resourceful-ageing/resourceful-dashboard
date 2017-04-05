@@ -1,0 +1,5 @@
+---
+applications:
+ - name: resourceful-ageing-app
+   host: resourceful-ageing-app
+   memory: 256M

@@ -1,0 +1,9 @@
+node_modules/
+public/export/
+*.DS_Store
+README.md
+.github/
+.git/
+.gitignore
+logs
+*.log
