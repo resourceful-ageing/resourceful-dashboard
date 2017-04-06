@@ -11,7 +11,7 @@ auth-token=...
 ```
 
 ### Run dashboard locally
-Edit "vcap-local.json" and add the credentials from IBM's CloudantDB.
+Edit "vcap-local.json" & ".cloudant" and add the credentials from IBM's CloudantDB.
 To find the credentials, login to https://console.eu-gb.bluemix.net/dashboard/apps/ -> "All Services" -> "Cloudant NoSQL DB-wd" -> "Service credentials" -> "Actions" -> "View credentials".
 ```shell
 npm start
