@@ -80,36 +80,60 @@ CloudantExport.prototype.listDatabases = function(creds) {
 CloudantExport.prototype.downloadDatabase = function(cloudant, dbName) {
   var controller = this;
     return new Promise(function(resolve, reject) {
-        var db = cloudant.use(dbName);
-
-        db.list({
-            include_docs: true
+      
+      var sensors = {};
+      var sensorsDB = cloudant.use('sensors');
+      sensorsDB.list({
+          include_docs: true
+      }, function(err, body) {
+        for (var s in body.rows) {
+          sensors[body.rows[s].doc.sensorId] = body.rows[s].doc.gatewayId;
+        }
+        
+        var logsDB = cloudant.use(dbName);
+        logsDB.list({
+          include_docs: true
         }, function(err, body) {
-            if (err) {
-                return reject(Error('Failed to list documents'));
-            }
+          if (err) {
+              return reject(Error('Failed to list documents'));
+          }
 
-            try {
-                fs.statSync(controller.folder);
-            } catch (e) {
-                fs.mkdirSync(controller.folder);
-            }
+          try {
+              fs.statSync(controller.folder);
+          } catch (e) {
+              fs.mkdirSync(controller.folder);
+          }
+          
+          var items = '';
+          for (var i in body.rows) {
+            var item = body.rows[i].doc;            
+            homeId = typeof(sensors[item.deviceId]) !== 'undefined' ? sensors[item.deviceId] : '';
             
-            var items = body.rows.map(function(item) {
-              return {
-                "deviceId": item.doc.deviceId,
-                "eventType": item.doc.eventType,
-                "timestamp": item.doc.timestamp,
-                "data": item.doc.data
+            if (item.eventType == 'air') {
+              for (var d in body.rows[i].doc.data.d) {
+                items += '{"homeId": "'+homeId+'", "deviceId": "'+item.deviceId+'", "event": "'+d+'", "timestamp": "'+item.timestamp+'", "data": {';
+                items += '"'+d+'": "'+body.rows[i].doc.data.d[d]+'"';
+                items += '}}\r\n';
               }
-            });
-            
-            var exportObj = {
-              "logs": items
+            } else {
+              items += '{"homeId": "'+homeId+'", "deviceId": "'+item.deviceId+'", "event": "'+item.eventType+'", "timestamp": "'+item.timestamp+'", "data": {';
+              var count = 0;
+              if (typeof(body.rows[i].doc.data) !== 'undefined' && typeof(body.rows[i].doc.data.d) !== 'undefined') {
+                var totalProps = Object.keys(body.rows[i].doc.data.d).length;
+                for (var d in body.rows[i].doc.data.d) {
+                  count++;
+                  items += '"'+d+'": "'+body.rows[i].doc.data.d[d]+'"';
+                  if (count < totalProps) {
+                    items += ', ';
+                  }
+                }
+              }
+              items += '}}\r\n';
             }
-            
-            fs.writeFileAsync(controller.folder + '/' + dbName + '.json', JSON.stringify(exportObj)).then(resolve, reject);
+          }
+          fs.writeFileAsync(controller.folder + '/' + dbName + '.txt', items).then(resolve, reject);
         });
+      });
     });
 };
 

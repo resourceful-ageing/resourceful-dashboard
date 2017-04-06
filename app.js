@@ -53,6 +53,7 @@ if (appEnv.services['cloudantNoSQLDB']) {
   global.gatewayDb = cloudant.db.use('gateways');
   global.sensorDb = cloudant.db.use('sensors');
   global.allSensors = new Array();
+  //global.gateways = new Array();
 }
 
 

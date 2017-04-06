@@ -7,3 +7,4 @@ logs
 *.log
 appClient.properties
 vcap-local.json
+.cloudant
