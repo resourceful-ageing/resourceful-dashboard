@@ -1,0 +1,26 @@
+{
+  "services": {
+    "cloudantNoSQLDB": [
+      {
+        "credentials": {
+          "username": "",
+          "password": "",
+          "host": "",
+          "port": 443,
+          "url": ""
+        },
+        "syslog_drain_url": null,
+        "label": "cloudantNoSQLDB",
+        "provider": null,
+        "plan": "Standard",
+        "name": "Cloudant NoSQL DB-wd",
+        "tags": [
+          "data_management",
+          "ibm_created",
+          "lite",
+          "ibm_dedicated_public"
+        ]
+      }
+    ]
+  }
+}

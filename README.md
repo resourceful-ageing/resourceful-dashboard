@@ -2,7 +2,7 @@
 
 ## Installation
 Before you are able to use the dashboard, you need to fill in the IBM application credentials.
-These can be found...
+To create new credentials (only when lost), login to https://6tv4n6.internetofthings.ibmcloud.com/dashboard/#/apps/apikeys-v2 -> "Generate API Key".
 
 Edit "appClient.properties"
 ```shell
@@ -11,8 +11,8 @@ auth-token=...
 ```
 
 ### Run dashboard locally
-Edit "vcap-local.json" with the credentials from IBM's CloudantDB.
-These can be found...
+Edit "vcap-local.json" and add the credentials from IBM's CloudantDB.
+To find the credentials, login to https://console.eu-gb.bluemix.net/dashboard/apps/ -> "All Services" -> "Cloudant NoSQL DB-wd" -> "Service credentials" -> "Actions" -> "View credentials".
 ```shell
 npm start
 ```
@@ -22,4 +22,4 @@ To deploy the application to IBM cloud, use Cloud Foundy.
 cp push
 ```
 
-After deployment is done and the app has been restarted, open https://resourceful-ageing-app.eu-gb.mybluemix.net to to verify the changes.
+After deployment is done and the app has been restarted, open https://resourceful-ageing-app.eu-gb.mybluemix.net to verify the changes.
