@@ -99,6 +99,7 @@ properties.parse('./appClient.properties', {path: true}, function(err, cfg) {
           var obj = JSON.parse(payload);
           console.log('response list-sensors');
           var devices = JSON.parse(obj.devices);
+          console.log(devices);
           var deviceArray = [];
           for (var d in devices) {
             deviceArray.push(d);

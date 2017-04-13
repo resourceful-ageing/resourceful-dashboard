@@ -22,12 +22,22 @@ block scripts
               if (sensorData.length > 0) {
                 for(var s=0; s < sensorData.length; s++) {
                   let sensorContainer = $('[data-info="sensor"][data-id="'+sensorData[s].sensorId+'"]', sensorsContainer);
-                  let state = ((moment(moment().unix()).diff(sensorData[s].lastStatus))) > 10 ? 'offline' : 'online';
+                  let state = '';
+                  if (sensorData[s].lastStatus == 0) {
+                    state = 'offline';
+                  } else {
+                    state = (moment(moment().unix()).diff(sensorData[s].lastStatus)) > 10 ? 'offline' : 'online';
+                  }
+                  
                   sensorContainer.attr('data-state', state);
-                  $('td[data-ref="lastLog"]', sensorContainer).text(moment.unix(sensorData[s].lastLog).format("HH:mm:ss DD/MM/YYYY"));
+                  
+                  var lastLog = sensorData[s].lastLog == 0 ? "-" : moment.unix(sensorData[s].lastLog).format("HH:mm:ss DD/MM/YYYY");
+                  $('td[data-ref="lastLog"]', sensorContainer).text(lastLog);
                   $('td[data-ref="lastStatus"]', sensorContainer).text(moment.unix(sensorData[s].lastStatus).format("HH:mm:ss DD/MM/YYYY"));
                   
-                  lastLogDate = moment.unix(sensorData[s].lastStatus).format("HH:mm:ss DD/MM/YYYY");
+                  if (sensorData[s].lastStatus != 0) {
+                    lastLogDate = moment.unix(sensorData[s].lastStatus).format("HH:mm:ss DD/MM/YYYY");
+                  }
                 };
               }
               

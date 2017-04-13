@@ -179,9 +179,8 @@ module.exports = function(passport) {
     global.sensorDb.list({ include_docs: true }, function(err, body) {
       if (!err) {
         body.rows.forEach(function(row) {
-          
-          var validDate = row.doc.validDates.from <= moment().unix() && (row.doc.validDates.till >= moment().unix() || row.doc.validDates.till == '');
-          if(row.doc.gatewayId == gatewayId && validDate)
+          var validDate = (row.doc.validDates.from <= moment().unix() || row.doc.validDates.from == '0') && (row.doc.validDates.till >= moment().unix() || row.doc.validDates.till == '0');
+          if(row.doc.gatewayId == gatewayId && validDate) {
             sensors.push({
               'sensorId': row.doc.sensorId,
               'gatewayId': row.doc.gatewayId,
@@ -190,6 +189,7 @@ module.exports = function(passport) {
               'lastStatus': row.doc.lastStatus,
               'validDates': row.doc.validDates
             });
+          }
         });
         res.json(sensors);
       }
