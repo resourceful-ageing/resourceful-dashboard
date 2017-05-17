@@ -16,10 +16,13 @@ To find the credentials, login to https://console.eu-gb.bluemix.net/dashboard/ap
 ```shell
 npm start
 ```
+
+May need to update packaged using `bower`
+
 ## Deploy to IBM Cloud
 To deploy the application to IBM cloud, use Cloud Foundy.
 ```shell
-cp push
+cf push
 ```
 
 After deployment is done and the app has been restarted, open https://resourceful-ageing-app.eu-gb.mybluemix.net to verify the changes.
