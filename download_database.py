@@ -2,6 +2,7 @@
 
 import requests
 import argparse
+import json
 
 parser = argparse.ArgumentParser(description='Download data from bluemix cloudant')
 parser.add_argument('user', help='username')
@@ -13,5 +14,22 @@ addr = "https://432c9dcf-0290-41c5-81cc-b02b0d24651e-bluemix.cloudant.com/" + ar
 r = requests.get(addr, auth=(args.user, args.password))
 
 with open(args.db + '.json', 'w') as f:
-    f.write(r.text)
+    for r in r.json()['rows']:
+        try:
+            d = r['doc']
+            event = d['eventType']
+            home_id = ''
+            device_id = d['deviceId']
+            data = d['data']['d']
+            timestamp = d['timestamp']
+
+            f.write(json.dumps({
+                'homeId': home_id,
+                'deviceId': device_id,
+                'event': event,
+                'timestamp': timestamp,
+                'data': data
+                }) + '\n')
+        except KeyError:
+            continue
 
