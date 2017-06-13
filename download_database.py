@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import datetime
 import requests
 import argparse
 import json
@@ -13,19 +14,17 @@ def get_sensors(user, password):
         sensors[row['doc']['sensorId']] = row['doc']['gatewayId']
     return sensors
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Download data from bluemix cloudant')
-    parser.add_argument('user', help='username')
-    parser.add_argument('password', help='password')
-    parser.add_argument('db', help='name of the database, e.g. iotp_6tv4n6_default_2017-06-06')
-    args = parser.parse_args()
+def strptime(d):
+    return datetime.datetime.strptime(d, '%Y-%m-%d')
 
-    addr = "https://432c9dcf-0290-41c5-81cc-b02b0d24651e-bluemix.cloudant.com/" + args.db + "/_all_docs?include_docs=true"
-    r = requests.get(addr, auth=(args.user, args.password))
+def download_db(user, password, db, sensors):
+    addr = "https://432c9dcf-0290-41c5-81cc-b02b0d24651e-bluemix.cloudant.com/" + db + "/_all_docs?include_docs=true"
+    r = requests.get(addr, auth=(user, password))
+    if r.status_code != 200:
+        print(db, "not found")
+        return
 
-    sensors = get_sensors(args.user, args.password)
-
-    with open(args.db + '.json', 'w') as f:
+    with open(db + '.json', 'w') as f:
         for row in r.json()['rows']:
             d = row['doc']
             try:
@@ -44,4 +43,24 @@ if __name__ == '__main__':
                     }) + '\n')
             except KeyError:
                 continue
+    print(db, "done")
+
+
+if __name__ == '__main__':
+
+    db_prefix = 'iotp_6tv4n6_default_'
+    parser = argparse.ArgumentParser(description='Download data from bluemix cloudant')
+    parser.add_argument('user', help='username')
+    parser.add_argument('password', help='password')
+    parser.add_argument('start', type=strptime, help='start date in YYYY-MM-DD format')
+    parser.add_argument('end', type=strptime, help='end date in YYYY-MM-DD format')
+    args = parser.parse_args()
+
+    sensors = get_sensors(args.user, args.password)
+    start = args.start
+    end = args.end
+
+    while start <= end:
+        download_db(args.user, args.password, db_prefix + start.strftime('%Y-%m-%d'), sensors)
+        start += datetime.timedelta(days=1)
 
