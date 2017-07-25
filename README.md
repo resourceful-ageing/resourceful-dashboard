@@ -22,6 +22,8 @@ npm start
 ## Deploy to IBM Cloud
 To deploy the application to IBM cloud, use Cloud Foundy.
 ```shell
+# if not already logged in
+cf login -a https://api.eu-gb.bluemix.net -u <username>
 cf push
 ```
 
