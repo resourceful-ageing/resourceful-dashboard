@@ -14,10 +14,9 @@ auth-token=...
 Edit "vcap-local.json" & ".cloudant" and add the credentials from IBM's CloudantDB.
 To find the credentials, login to https://console.eu-gb.bluemix.net/dashboard/apps/ -> "All Services" -> "Cloudant NoSQL DB-wd" -> "Service credentials" -> "Actions" -> "View credentials".
 ```shell
+bower install
 npm start
 ```
-
-May need to update packaged using `bower`
 
 ## Deploy to IBM Cloud
 To deploy the application to IBM cloud, use Cloud Foundy.

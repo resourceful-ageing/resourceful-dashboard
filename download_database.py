@@ -14,8 +14,10 @@ def get_sensors(user, password):
         sensors[row['doc']['sensorId']] = row['doc']['gatewayId']
     return sensors
 
+
 def strptime(d):
     return datetime.datetime.strptime(d, '%Y-%m-%d')
+
 
 def download_db(user, password, db, sensors):
     addr = "https://432c9dcf-0290-41c5-81cc-b02b0d24651e-bluemix.cloudant.com/" + db + "/_all_docs?include_docs=true"

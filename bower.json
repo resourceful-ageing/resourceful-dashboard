@@ -1,0 +1,23 @@
+{
+  "name": "resourceful-dashboard",
+  "description": "",
+  "main": "",
+  "authors": [
+    "kc1212 <kc1212@users.noreply.github.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/resourceful-ageing/resourceful-dashboard",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-css": "^3.3.6",
+    "smoothie": "^1.27.0",
+    "moment": "^2.15.1",
+    "jquery": "^3.2.1"
+  }
+}
